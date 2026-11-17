@@ -84,7 +84,7 @@ var DATA={"dip": {"fields": [{"p": 0, "n": "company", "x0": 131.6, "top": 256.0,
     $("choose").classList.add("hide"); $("app").classList.remove("hide");
     document.querySelectorAll(".tabs button").forEach(function(b){b.classList.toggle("on",b.dataset.k===k)});
     $("ttl").textContent=k==="dip"?"Modulo di trasferta – DIPENDENTE":"Modulo di trasferta – FREELANCE";
-    $("helptxt").innerHTML="<b>1.</b> Clicca nei campi azzurri e scrivi. &nbsp;<b>2.</b> Firma nel riquadro in fondo (col mouse o col dito). &nbsp;<b>3.</b> Premi <b>⬇ Scarica PDF</b> in alto. &nbsp;<b>4.</b> Allega il file a una mail e invialo "+
+    $("helptxt").innerHTML="<b>1.</b> Clicca nei campi azzurri e scrivi. &nbsp;<b>2.</b> Firma nel riquadro in fondo col mouse o col dito <i>(facoltativo: se usi la tua firma digitale puoi lasciarlo vuoto e firmare dopo sul PDF)</i>. &nbsp;<b>3.</b> Premi <b>⬇ Scarica PDF</b> in alto. &nbsp;<b>4.</b> Allega il file a una mail e invialo "+
       (k==="dip"?"all'amministrazione (Thiago) <b>almeno 7 giorni prima della partenza</b>.":"al tuo <b>responsabile di progetto</b> prima della partenza.");
     $("msg").innerHTML="";
     render();
@@ -193,8 +193,10 @@ var DATA={"dip": {"fields": [{"p": 0, "n": "company", "x0": 131.6, "top": 256.0,
     // firma
     var s=d.sign, cv=$("sigcv"), pg=pages[s.p];
     pg.drawText("Signature / Firma",{x:s.x0,y:H-s.top+4,size:8,font:font,color:L.rgb(0.25,0.25,0.25)});
-    var png=await pdf.embedPng(cv.toDataURL("image/png"));
-    pg.drawImage(png,{x:s.x0,y:H-s.bot,width:s.x1-s.x0,height:s.bot-s.top});
+    if(sig[kind]&&sig[kind].length){
+      var png=await pdf.embedPng(cv.toDataURL("image/png"));
+      pg.drawImage(png,{x:s.x0,y:H-s.bot,width:s.x1-s.x0,height:s.bot-s.top});
+    }
     pdf.setTitle(kind==="dip"?"Employee - Business Trip Application Form":"Business Trip Application Form - Freelance");
     return await pdf.save();
   }
@@ -202,12 +204,11 @@ var DATA={"dip": {"fields": [{"p": 0, "n": "company", "x0": 131.6, "top": 256.0,
   function validate(){
     var d=DATA[kind], miss=0;
     d.fields.forEach(function(f){ var el=$("f_"+f.n); if(!opt[f.n] && !String(f.val||"").trim()){ el.classList.add("bad"); miss++; } });
-    if(!(sig[kind]&&sig[kind].length)){ $("sigcv").classList.add("bad"); miss++; }
     return miss;
   }
 
   $("go").onclick=async function(){
-    if(validate()){ msg("err","<b>Mancano dei dati.</b> Compila i campi in <b>rosso</b> (e la firma), poi premi di nuovo <b>⬇ Scarica PDF</b>."); var b=document.querySelector(".bad"); if(b) b.scrollIntoView({behavior:"smooth",block:"center"}); return; }
+    if(validate()){ msg("err","<b>Mancano dei dati.</b> Compila i campi in <b>rosso</b>, poi premi di nuovo <b>⬇ Scarica PDF</b>."); var b=document.querySelector(".bad"); if(b) b.scrollIntoView({behavior:"smooth",block:"center"}); return; }
     if(!window.PDFLib){ msg("err","La pagina non si è caricata del tutto. Ricaricala e riprova."); return; }
     var btn=$("go"); btn.disabled=true; btn.textContent="Preparo il PDF…";
     try{
