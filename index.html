@@ -4,56 +4,133 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Modulo di trasferta – Hopscotch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--navy:#1F2A44;--teal:#0F766E;--red:#B91C1C;--bg:#E5E7EB;--txt:#111827;--mut:#6B7280}
+  :root{--navy:#14213D;--navy2:#1F2A44;--teal:#0F766E;--teal2:#14B8A6;--green:#059669;--red:#B91C1C;--ink:#0F172A;--mut:#64748B;--line:#E2E8F0;--soft:#F1F5F9}
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt)}
-  .bar{position:sticky;top:0;z-index:10;background:var(--navy);color:#fff;padding:12px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;box-shadow:0 2px 6px rgba(0,0,0,.2)}
-  .bar h1{font-size:17px;margin:0;flex:1 1 220px}
-  .bar button{border:0;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:800;cursor:pointer}
-  #go{background:#10B981;color:#fff;font-size:16px}
-  #go:disabled{opacity:.5}
-  .tabs button{background:#334155;color:#CBD5E1;padding:9px 14px;font-size:14px}
-  .tabs button.on{background:#fff;color:var(--navy)}
-  .help{max-width:900px;margin:14px auto 0;padding:0 12px}
-  .help div{background:#FEF9C3;border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.5}
-  #msg{max-width:900px;margin:10px auto 0;padding:0 12px}
-  #msg div{border-radius:10px;padding:12px 14px;font-size:14px}
-  .err{background:#FEE2E2;color:#7F1D1D}.ok{background:#CCFBF1;color:#134E4A}.warn{background:#FFEDD5;color:#7C2D12}
-  .pages{max-width:900px;margin:14px auto 40px;padding:0 12px;display:grid;gap:16px}
-  .page{position:relative;width:100%;aspect-ratio:595.3/841.9;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.15)}
-  .page img{position:absolute;inset:0;width:100%;height:100%;user-select:none;pointer-events:none}
-  .f{font-weight:700;position:absolute;border:1px solid #7FA7D1;background:#DBEEFE;color:#111827;font-family:Arial,Helvetica,sans-serif;padding:0 3px;margin:0;border-radius:2px;resize:none;overflow:hidden}
-  .f:focus{outline:2px solid #0284C7;background:#EFF8FF}
+  html,body{margin:0}
+  body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);
+       background:radial-gradient(1200px 600px at 50% -200px,#DDE7F3 0%,#EEF2F7 45%,#F4F6F9 100%) fixed;min-height:100vh}
+  button{font-family:inherit}
+  .hide{display:none!important}
+
+  /* ---------- schermata iniziale ---------- */
+  .hero{background:linear-gradient(135deg,#14213D 0%,#1F2A44 55%,#134E4A 130%);color:#fff;padding:44px 20px 110px;text-align:center}
+  .brand{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:.18em;color:#A7F3D0;text-transform:uppercase}
+  .brand i{width:8px;height:8px;border-radius:50%;background:#34D399;display:inline-block}
+  .hero h1{font-size:clamp(26px,4vw,38px);margin:14px 0 8px;font-weight:800;letter-spacing:-.02em}
+  .hero p{margin:0 auto;max-width:560px;color:#CBD5E1;font-size:16px;line-height:1.55}
+  .choices{max-width:760px;margin:-72px auto 0;padding:0 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:620px){.choices{grid-template-columns:1fr}}
+  .choice{background:#fff;border:0;border-radius:18px;padding:24px 22px;text-align:left;cursor:pointer;box-shadow:0 10px 30px rgba(15,23,42,.12);
+          transition:transform .15s ease, box-shadow .15s ease;display:flex;flex-direction:column;gap:10px;border-top:5px solid var(--teal)}
+  .choice.free{border-top-color:var(--navy2)}
+  .choice:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(15,23,42,.18)}
+  .choice .ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:#CCFBF1;color:var(--teal)}
+  .choice.free .ic{background:#E0E7FF;color:var(--navy2)}
+  .choice b{font-size:20px;font-weight:800;color:var(--ink)}
+  .choice span{font-size:14px;color:var(--mut);line-height:1.45}
+  .choice em{font-style:normal;font-weight:700;font-size:14px;color:var(--teal);margin-top:4px}
+  .choice.free em{color:var(--navy2)}
+  .how{max-width:760px;margin:26px auto 50px;padding:0 16px}
+  .how h3{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:0 0 12px;text-align:center}
+
+  /* ---------- passi ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media(max-width:760px){.steps{grid-template-columns:1fr 1fr}}
+  .step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.4}
+  .step .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px}
+  .step small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
+
+  /* ---------- barra modulo ---------- */
+  .bar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);
+       border-bottom:1px solid var(--line);box-shadow:0 4px 18px rgba(15,23,42,.06)}
+  .bar-in{max-width:960px;margin:0 auto;padding:10px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .bar .who{flex:1 1 220px;min-width:0}
+  .bar .who small{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--teal);text-transform:uppercase}
+  .bar h1{font-size:17px;margin:2px 0 0;font-weight:800;letter-spacing:-.01em}
+  .tabs{display:inline-flex;background:var(--soft);border-radius:12px;padding:4px;gap:2px}
+  .tabs button{border:0;background:transparent;color:var(--mut);padding:8px 14px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer}
+  .tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(15,23,42,.12)}
+  .dl{border:0;border-radius:12px;padding:12px 20px;font-size:15px;font-weight:800;cursor:pointer;color:#fff;
+      background:linear-gradient(180deg,#10B981,#059669);box-shadow:0 6px 16px rgba(5,150,105,.35);display:inline-flex;align-items:center;gap:8px}
+  .dl:hover{filter:brightness(1.05)}
+  .dl:disabled{opacity:.55;cursor:default}
+  .wrap{max-width:960px;margin:0 auto;padding:18px 16px 0}
+  #msg{max-width:960px;margin:0 auto;padding:12px 16px 0}
+  #msg div{border-radius:14px;padding:14px 16px;font-size:14.5px;line-height:1.5;border:1px solid transparent}
+  .err{background:#FEF2F2;color:#7F1D1D;border-color:#FECACA!important}
+  .ok{background:#ECFDF5;color:#064E3B;border-color:#A7F3D0!important}
+  .warn{background:#FFF7ED;color:#7C2D12;border-color:#FED7AA!important}
+
+  /* ---------- fogli ---------- */
+  .pages{max-width:960px;margin:0 auto;padding:30px 16px 10px;display:grid;gap:44px;counter-reset:pg}
+  .page{position:relative;width:100%;aspect-ratio:595.3/841.9;background:#fff;border-radius:6px;
+        box-shadow:0 1px 2px rgba(15,23,42,.06),0 12px 40px rgba(15,23,42,.14);counter-increment:pg}
+  .page::before{content:"Pagina " counter(pg) " di 2";position:absolute;top:-24px;left:2px;font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.04em}
+  .page img{position:absolute;inset:0;width:100%;height:100%;user-select:none;pointer-events:none;border-radius:6px}
+  .f{font-weight:700;position:absolute;border:1px solid #93C5FD;background:#E0F2FE;color:#0B1F4D;font-family:Arial,Helvetica,sans-serif;padding:0 3px;margin:0;border-radius:3px;resize:none;overflow:hidden;transition:background .15s,border-color .15s}
+  .f:hover{border-color:#3B82F6}
+  .f:focus{outline:2px solid #2563EB;outline-offset:0;background:#F0F9FF}
   .f.full{background:#FED7AA;border-color:#EA580C}
-  .f.bad{background:#FECACA;border-color:#DC2626}
-  .sig{position:absolute;border:1px dashed #7FA7D1;background:#DBEEFE;touch-action:none;cursor:crosshair}
-  .sig.bad{background:#FECACA;border-color:#DC2626}
-  .siglab{position:absolute;font:italic 11px Arial;color:#374151}
-  .clr{position:absolute;font:12px Arial;background:#fff;border:1px solid #94A3B8;border-radius:6px;padding:2px 8px;cursor:pointer}
-  .hide{display:none}
-  .chooser{max-width:700px;margin:40px auto;padding:0 16px;text-align:center}
-  .chooser h2{color:var(--navy)}
-  .chooser button{display:block;width:100%;margin:12px 0;padding:20px;border:0;border-radius:14px;font-size:19px;font-weight:800;color:#fff;cursor:pointer}
+  .f.bad{background:#FEE2E2;border-color:#DC2626}
+  .sig{position:absolute;border:1.5px dashed #60A5FA;background:#E0F2FE;border-radius:4px;touch-action:none;cursor:crosshair}
+  .sig.bad{background:#FEE2E2;border-color:#DC2626}
+  .clr{position:absolute;font:600 12px Inter,Arial;background:#fff;color:var(--ink);border:1px solid #CBD5E1;border-radius:8px;padding:4px 10px;cursor:pointer}
+  .clr:hover{background:var(--soft)}
+  .end{max-width:960px;margin:0 auto;padding:14px 16px 60px;text-align:center}
+  .end p{color:var(--mut);font-size:13.5px;margin:12px 0 0}
+  .end .dl{padding:16px 30px;font-size:17px}
 </style>
 </head>
 <body>
 
-<div id="choose" class="chooser hide">
-  <h2>Quale modulo devi compilare?</h2>
-  <button style="background:#0F766E" data-k="dip">Sono DIPENDENTE Hopscotch</button>
-  <button style="background:#1F2A44" data-k="free">Sono FREELANCE</button>
+<div id="choose" class="hide">
+  <div class="hero">
+    <div class="brand"><i></i>Hopscotch · Trasferte di lavoro</div>
+    <h1>Modulo di trasferta</h1>
+    <p>Compila il modulo ufficiale, scaricalo in PDF e invialo per mail. Ci vogliono 2 minuti.</p>
+  </div>
+  <div class="choices">
+    <button class="choice" data-k="dip">
+      <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg></div>
+      <b>Sono dipendente</b>
+      <span>Modulo Hopscotch Staff. Da inviare all'amministrazione almeno 7 giorni prima della partenza.</span>
+      <em>Compila il modulo &rarr;</em>
+    </button>
+    <button class="choice free" data-k="free">
+      <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+      <b>Sono freelance</b>
+      <span>Modulo per collaboratori esterni. Da inviare al responsabile di progetto prima della partenza.</span>
+      <em>Compila il modulo &rarr;</em>
+    </button>
+  </div>
+  <div class="how">
+    <h3>Come funziona</h3>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><div>Scrivi nei campi azzurri</div></div>
+      <div class="step"><span class="n">2</span><div>Firma in fondo<small>facoltativo</small></div></div>
+      <div class="step"><span class="n">3</span><div>Premi «Scarica PDF»</div></div>
+      <div class="step"><span class="n">4</span><div>Allega il PDF a una mail</div></div>
+    </div>
+  </div>
 </div>
 
 <div id="app" class="hide">
-  <div class="bar">
-    <h1 id="ttl">Modulo di trasferta</h1>
-    <span class="tabs"><button data-k="dip">Dipendente</button> <button data-k="free">Freelance</button></span>
-    <button id="go" type="button">⬇ Scarica PDF</button>
-  </div>
-  <div class="help"><div id="helptxt"></div></div>
+  <div class="bar"><div class="bar-in">
+    <div class="who"><small>Hopscotch · Trasferte</small><h1 id="ttl">Modulo di trasferta</h1></div>
+    <span class="tabs"><button data-k="dip">Dipendente</button><button data-k="free">Freelance</button></span>
+    <button id="go" class="dl" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span>Scarica PDF</span></button>
+  </div></div>
+  <div class="wrap"><div class="steps" id="helptxt"></div></div>
   <div id="msg"></div>
   <div class="pages" id="pages"></div>
+  <div class="end">
+    <button id="go2" class="dl" type="button"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Ho finito: scarica il PDF</button>
+    <p id="endnote"></p>
+  </div>
 </div>
 
 <script>!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"function"==typeof define&&define.amd?define(["exports"],e):e((t=t||self).PDFLib={})}(this,(function(t){"use strict";
@@ -94,8 +171,12 @@ var DATA={"dip": {"fields": [{"p": 0, "n": "company", "x0": 131.6, "top": 256.0,
     $("choose").classList.add("hide"); $("app").classList.remove("hide");
     document.querySelectorAll(".tabs button").forEach(function(b){b.classList.toggle("on",b.dataset.k===k)});
     $("ttl").textContent=k==="dip"?"Modulo di trasferta – DIPENDENTE":"Modulo di trasferta – FREELANCE";
-    $("helptxt").innerHTML="<b>1.</b> Clicca nei campi azzurri e scrivi. &nbsp;<b>2.</b> Firma nel riquadro in fondo col mouse o col dito <i>(facoltativo: se usi la tua firma digitale puoi lasciarlo vuoto e firmare dopo sul PDF)</i>. &nbsp;<b>3.</b> Premi <b>⬇ Scarica PDF</b> in alto. &nbsp;<b>4.</b> Allega il file a una mail e invialo "+
-      (k==="dip"?"all'amministrazione (Thiago) <b>almeno 7 giorni prima della partenza</b>.":"al tuo <b>responsabile di progetto</b> prima della partenza.");
+    var dest=(k==="dip"?"all'amministrazione (Thiago) <b>almeno 7 giorni prima</b>":"al tuo <b>responsabile di progetto</b>");
+    $("helptxt").innerHTML='<div class="step"><span class="n">1</span><div>Clicca nei <b>campi azzurri</b> e scrivi</div></div>'+
+      '<div class="step"><span class="n">2</span><div>Firma nel riquadro in fondo<small>facoltativo se usi la firma digitale</small></div></div>'+
+      '<div class="step"><span class="n">3</span><div>Premi <b>Scarica PDF</b></div></div>'+
+      '<div class="step"><span class="n">4</span><div>Allega il PDF a una mail<small>'+(k==="dip"?"all'amministrazione, 7 giorni prima":"al responsabile di progetto")+'</small></div></div>';
+    $("endnote").innerHTML="Il file scaricato contiene solo il modulo. Allegalo a una mail e invialo "+dest+".";
     $("msg").innerHTML="";
     render();
     try{ if(location.hash!=="#"+(k==="dip"?"dipendente":"freelance")) location.hash=(k==="dip"?"dipendente":"freelance"); }catch(e){}
@@ -220,9 +301,9 @@ var DATA={"dip": {"fields": [{"p": 0, "n": "company", "x0": 131.6, "top": 256.0,
   }
 
   $("go").onclick=async function(){
-    if(validate()){ msg("err","<b>Mancano dei dati.</b> Compila i campi in <b>rosso</b>, poi premi di nuovo <b>⬇ Scarica PDF</b>."); var b=document.querySelector(".bad"); if(b) b.scrollIntoView({behavior:"smooth",block:"center"}); return; }
+    if(validate()){ msg("err","<b>Mancano dei dati.</b> Compila i campi in <b>rosso</b>, poi premi di nuovo <b>Scarica PDF</b>."); var b=document.querySelector(".bad"); if(b) b.scrollIntoView({behavior:"smooth",block:"center"}); return; }
     if(!window.PDFLib){ msg("err","La pagina non si è caricata del tutto. Ricaricala e riprova."); return; }
-    var btn=$("go"); btn.disabled=true; btn.textContent="Preparo il PDF…";
+    var btn=$("go"); btn.disabled=true; btn.querySelector("span").textContent="Preparo il PDF…";
     try{
       var bytes=await build();
       var who=DATA[kind].fields.filter(function(f){return f.n==="employee"||f.n==="provider"})[0];
@@ -232,12 +313,13 @@ var DATA={"dip": {"fields": [{"p": 0, "n": "company", "x0": 131.6, "top": 256.0,
       document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},4000);
       msg("ok","<b>Fatto!</b> Hai salvato <b>"+name+"</b> (di solito è nella cartella <b>Download</b>).<br><b>Ora allegalo a una mail</b> e invialo "+(kind==="dip"?"all'amministrazione (Thiago).":"al tuo responsabile di progetto.")+" Non serve altro.");
     }catch(e){
-      if(e&&e.code==="declined") msg("warn","Hai annullato il salvataggio. Premi di nuovo <b>⬇ Scarica PDF</b> e conferma.");
+      if(e&&e.code==="declined") msg("warn","Hai annullato il salvataggio. Premi di nuovo <b>Scarica PDF</b> e conferma.");
       else msg("err","Non sono riuscito a creare il file. Riprova; se non funziona avvisa Thiago.");
     }
-    btn.disabled=false; btn.textContent="⬇ Scarica PDF";
+    btn.disabled=false; btn.querySelector("span").textContent="Scarica PDF";
   };
 
+  $("go2").onclick=function(){ $("go").click(); };
   document.querySelectorAll("[data-k]").forEach(function(b){ b.onclick=function(){ show(b.dataset.k); }; });
   function route(){ var h=(location.hash||"").replace("#",""); if(h==="dipendente") show("dip"); else if(h==="freelance") show("free"); else { $("app").classList.add("hide"); $("choose").classList.remove("hide"); } }
   window.addEventListener("hashchange",function(){ var h=location.hash.replace("#",""); if((h==="dipendente"&&kind!=="dip")||(h==="freelance"&&kind!=="free")) route(); });
